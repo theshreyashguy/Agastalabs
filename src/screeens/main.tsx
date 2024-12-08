@@ -145,30 +145,41 @@ const MainScreen = () => {
           <View style={styles.extraDetails}>
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.parentTitle}>Registration Number</Text>
-              <Text style={{color: 'black'}}>{item.registrationnumber}</Text>
+              <Text style={styles.extra}>{item.registrationnumber}</Text>
             </View>
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.parentTitle}>Age</Text>
-              <Text style={{color: 'black'}}>{item.age}</Text>
+              <Text style={styles.extra}>{item.age}</Text>
             </View>
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.parentTitle}>DOB</Text>
-              <Text style={{color: 'black'}}>{item.DOB}</Text>
+              <Text style={styles.extra}>{item.DOB}</Text>
             </View>
           </View>
           <View style={styles.pDetails}>
-            <Text style={styles.parentTitle}>Family Member:</Text>
-            <Image
-              style={{width: 40, height: 40, borderRadius: 20}}
-              source={{uri: `${item.parentdetails.profilePicture}`}}
-            />
+            <Text style={styles.parentTitle}>Family Members:</Text>
+            <View style = {{flexDirection: 'row'}}>
+            {item.parentdetails.map((val) => {
+              return (
+                <Image
+                style={{width: 40, height: 40, borderRadius: 20,marginLeft:2}}
+                source={{uri: `${val.profilePicture}`}}
+                />
+              );
+            })}
+            </View>
           </View>
         </>
       ) : (
         <>
           <View style={styles.parentDetails}>
             <Text style={styles.details}>class</Text>
-            <Text style={{color: 'black'}}>
+            <Text
+              style={{
+                color: '#010101',
+                fontFamily: 'Avenir Next',
+                fontWeight: '700',
+              }}>
               {item.class.length <= 2
                 ? `${item.class[0]} ${item.class[1]}`
                 : `${item.class[1]} ${item.class[1]} &${
@@ -183,6 +194,7 @@ const MainScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  const len = filteredData.length
 
   const updateStudentDetails = (updatedStudent: Student) => {
     //  console.log(updateStudentDetails,selectedStudent);
@@ -196,31 +208,25 @@ const MainScreen = () => {
 
   return (
     <>
-      {isBottomSheetVisible && selectedStudent ? (
-        <>
-          <TouchableWithoutFeedback
-            onPress={() => setBottomSheetVisible(false)}>
-            <BlurView
-              style={StyleSheet.absoluteFill}
-              blurType="light"
-              blurAmount={10}
-              reducedTransparencyFallbackColor="white"
-            />
-          </TouchableWithoutFeedback>
-          <StudentDetailsBottomSheet
-            student={selectedStudent}
-            guardian={selectedStudent.parentdetails}
-            closeSheet={() => setBottomSheetVisible(false)}
-            setModalVisible={setModalVisible}
-          />
-        </>
-      ) : (
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <View style={{flexDirection: 'row'}}>
-              <ArrowLeftIcon size={28} />
-              <Text style={{color: 'black', fontSize: 22}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: 0.45 * windowWidth,
+                marginLeft: 4,
+              }}>
+              <ArrowLeftIcon size={18} />
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 18,
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '500',
+                }}>
                 🧑🏻‍🎓 Student List
               </Text>
             </View>
@@ -237,11 +243,11 @@ const MainScreen = () => {
                     setShowSearch(!showSearch);
                   }
                 }}>
-                <MagnifyingGlassIcon size={29} />
+                <MagnifyingGlassIcon size={24} />
               </TouchableOpacity>
               {/* Sort Icon */}
               <FunnelIcon
-                size={29}
+                size={24}
                 onPress={() => {
                   if (!showSearch) {
                     setShowFilter(!showFilter);
@@ -250,6 +256,7 @@ const MainScreen = () => {
               />
             </View>
           </View>
+
           {/* searchBar */}
           {showSearch && (
             <TextInput
@@ -277,18 +284,58 @@ const MainScreen = () => {
               flexDirection: 'row',
               justifyContent: 'space-between',
               width: windowWidth,
-              padding: 15,
+              padding: 13,
             }}>
-            <Text style={{color: 'black', fontSize: 24}}>All Students</Text>
+            <View style={{flexDirection: 'row',justifyContent:'center',alignContent:'center',backgroundColor:'white'}}>
+              <Text
+                style={{
+                  color: '#010101',
+                  fontSize: 22,
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '600',
+                }}>
+                All Students{' '}
+              </Text>
+              <View
+                style={{
+                  backgroundColor: '#333333',
+                  borderRadius: 10,
+                  width: 29,
+                  height: 29,
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  flexDirection:'column'
+                }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontSize: 22,
+                    fontFamily: 'Avenir Next',
+                    fontWeight: '800',
+                    textAlign: 'center',
+                  }}>
+                  {len}
+                </Text>
+              </View>
+            </View>
+
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-evenly',
                 alignItems: 'center',
-                width: windowWidth * 0.3,
+                width: !isAnyChecked ? windowWidth * 0.1 : windowWidth * 0.3,
               }}>
               {isAnyChecked && (
-                <Text style={{color: 'blue', fontSize: 18}}>Invite</Text>
+                <Text
+                  style={{
+                    color: '#2688EB',
+                    fontSize: 18,
+                    fontWeight: '500',
+                    fontFamily: 'Avenir Next',
+                  }}>
+                  Invite
+                </Text>
               )}
               <CheckBox
                 checked={allCheck}
@@ -301,7 +348,7 @@ const MainScreen = () => {
                 }
                 uncheckedIcon={<View style={styles.uncheckedBox}></View>}
               />
-              {isAnyChecked && <TrashIcon size={20} />}
+              {isAnyChecked && <TrashIcon size={20} color={'#333333'} />}
             </View>
           </View>
 
@@ -314,7 +361,25 @@ const MainScreen = () => {
             />
           </View>
         </View>
-      )}
+      {/* )} */}
+       {isBottomSheetVisible && selectedStudent && (
+        <>
+          <TouchableWithoutFeedback
+            onPress={() => setBottomSheetVisible(false)}>
+            <BlurView
+              style={StyleSheet.absoluteFill}
+              blurType="light"
+              blurAmount={10}
+              reducedTransparencyFallbackColor="white"
+            />
+          </TouchableWithoutFeedback>
+          <StudentDetailsBottomSheet
+            student={selectedStudent}
+            guardian={selectedStudent.parentdetails[0]}
+            closeSheet={() => setBottomSheetVisible(false)}
+            setModalVisible={setModalVisible}
+          />
+        </>)}
       {modalVisible && (
         <EditSchoolDetailsModal
           isVisible={modalVisible}
@@ -326,11 +391,11 @@ const MainScreen = () => {
           onSave={updateStudentDetails}
         />
       )}
-      <View style={styles.bottomIconContainer}>
+     { !isBottomSheetVisible && <View style={styles.bottomIconContainer}>
         <TouchableOpacity onPress={() => {}}>
           <PlusCircleIcon size={50} color="black" style={{}} />
         </TouchableOpacity>
-      </View>
+      </View>}
     </>
   );
 };
@@ -343,24 +408,19 @@ const styles = StyleSheet.create({
     color: 'white',
     padding: 4,
     height: windowHeight,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: 'white',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     width: windowWidth,
-    backgroundColor: '#ffffff',
-    height: 0.08 * windowHeight,
-    paddingHorizontal: 6,
-    paddingVertical: 8,
-    borderBottomWidth: 0.5,
-    borderColor: '#e0e0e0',
-    shadowColor: '#grey',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    backgroundColor: 'transparent',
+    height: 0.065 * windowHeight,
+    paddingHorizontal: 5,
+    paddingVertical: 7,
+    alignContent: 'center',
+    fontFamily: 'Avenir Next',
   },
   searchInput: {
     width: windowWidth * 0.9,
@@ -372,58 +432,70 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
     marginTop: 9,
+    fontFamily: 'Avenir Next',
   },
   studentList: {
     flex: 1,
-    width: 0.9 * windowWidth,
+    width: 0.89 * windowWidth,
     paddingTop: 10,
+    fontFamily: 'Avenir Next',
   },
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
-    padding: 12,
+    padding: 7,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 1,
+    fontFamily: 'Avenir Next',
+    borderWidth: 0.1,
   },
   studentName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginBottom: 4,
-    color: 'black',
+    color: '#333333',
+    fontFamily: 'Avenir Next',
   },
   details: {
     fontSize: 14,
-    color: 'black',
+    color: '#777777',
+    fontFamily: 'Avenir Next',
   },
   parentDetails: {
-    marginTop: 10,
+    marginTop: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    fontFamily: 'Avenir Next',
+    color: '#333333',
   },
   pDetails: {
     marginTop: 10,
     flexDirection: 'column',
     justifyContent: 'flex-start',
+    fontFamily: 'Avenir Next',
   },
   extraDetails: {
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    fontFamily: 'Avenir Next',
   },
   StudentDetails: {
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    fontFamily: 'Avenir Next',
   },
   parentTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '400',
     marginBottom: 2,
-    color: 'black',
+    color: '#777777',
+    fontFamily: 'Avenir Next',
   },
   checkboxContainer: {
     padding: 0,
@@ -435,7 +507,7 @@ const styles = StyleSheet.create({
   checkedBox: {
     width: 24,
     height: 24,
-    backgroundColor: 'grey',
+    backgroundColor: '#333333',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
@@ -444,7 +516,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     backgroundColor: '#FFFFFF',
-    borderColor: '#000000',
+    borderColor: '#B8C1CC',
     borderWidth: 1,
     borderRadius: 5,
   },
@@ -452,6 +524,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Avenir Next',
   },
   bottomIconContainer: {
     position: 'absolute',
@@ -459,6 +532,12 @@ const styles = StyleSheet.create({
     left: '85%',
     transform: [{translateX: -15}], // To center the icon
     zIndex: 10, // Make sure it's on top of other content
+  },
+  extra: {
+    fontSize: 14,
+    color: '#010101',
+    fontFamily: 'Avenir Next',
+    fontWeight: '700',
   },
 });
 

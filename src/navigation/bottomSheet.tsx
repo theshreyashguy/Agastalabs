@@ -29,12 +29,12 @@ const StudentDetailsBottomSheet = ({
   student,
   guardian,
   closeSheet,
-  setModalVisible
+  setModalVisible,
 }: BottomProp) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   // Memoize snap points to avoid re-creating them on every render
-  const snapPoints = useMemo(() => ['80%', '60%'], []);
+  const snapPoints = useMemo(() => ['90%', '75%'], []);
 
   const renderContent = () => (
     <BottomSheetView style={styles.bottomSheetContainer}>
@@ -55,7 +55,10 @@ const StudentDetailsBottomSheet = ({
               width: windowWidth * 0.25,
               alignItems: 'center',
             }}>
-            <TouchableOpacity onPress={()=>{setModalVisible(true)}}>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(true);
+              }}>
               <PencilSquareIcon size={25} />
             </TouchableOpacity>
             <UserIcon size={25} />
@@ -72,13 +75,17 @@ const StudentDetailsBottomSheet = ({
               <Text style={styles.detailText}>
                 <Text style={styles.label}>Registration No:</Text>
               </Text>
-              <Text style={{color: 'black',fontWeight:'bold'}}>{student.registrationnumber}</Text>
+              <Text style={{color: '#010101', fontWeight: '700'}}>
+                {student.registrationnumber}
+              </Text>
             </View>
             <View style={styles.textContainer}>
               <Text style={styles.detailText}>
                 <Text style={styles.label}>DOB:</Text>
               </Text>
-              <Text style={{color: 'black',fontWeight:'bold'}}>{student.DOB}</Text>
+              <Text style={{color: '#010101', fontWeight: '700'}}>
+                {student.DOB}
+              </Text>
             </View>
           </View>
 
@@ -87,43 +94,57 @@ const StudentDetailsBottomSheet = ({
               <Text style={styles.detailText}>
                 <Text style={styles.label}>Mobile:</Text>
               </Text>
-              <Text style={{color: 'blue',textDecorationLine:'underline'}}>{student.mobile}</Text>
+              <Text style={{color: 'blue', textDecorationLine: 'underline'}}>
+                {student.mobile}
+              </Text>
             </View>
             <View style={styles.textContainer}>
               <Text style={styles.detailText}>
                 <Text style={styles.label}>Email:</Text>
               </Text>
-              <Text style={{color: 'blue',textDecorationLine:'underline'}}>{student.email}</Text>
+              <Text style={{color: 'blue', textDecorationLine: 'underline'}}>
+                {student.email}
+              </Text>
             </View>
           </View>
         </View>
       </View>
 
       {/* Guardian Information Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Guardian Information</Text>
-        <View style={styles.card}>
-          <Image
-            style={styles.profilePicture}
-            source={{uri: guardian.profilePicture}}
-          />
-          <Text style={styles.name}>{guardian.Name}</Text>
-          <View style={styles.row}>
-            <View style={styles.textContainer}>
-              <Text style={styles.detailText}>
-                <Text style={styles.label}>Email Address:</Text>
-              </Text>
-              <Text style={{color: 'blue',textDecorationLine:'underline'}}>{guardian.Email}</Text>
-            </View>
-            <View style={styles.textContainer}>
-              <Text style={styles.detailText}>
-                <Text style={styles.label}>Mobile:</Text>
-              </Text>
-              <Text style={{color: 'blue',textDecorationLine:'underline'}}>{guardian.Mobile}</Text>
+     
+      
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Guardian Information</Text>
+            <View style={styles.card}>
+              <Image
+                style={styles.profilePicture}
+                source={{uri: guardian.profilePicture}}
+              />
+              <Text style={styles.name}>{guardian.Name}</Text>
+              <View style={styles.row}>
+                <View style={styles.textContainer}>
+                  <Text style={styles.detailText}>
+                    <Text style={styles.label}>Email Address:</Text>
+                  </Text>
+                  <Text
+                    style={{color: 'blue', textDecorationLine: 'underline'}}>
+                    {guardian.Email}
+                  </Text>
+                </View>
+                <View style={styles.textContainer}>
+                  <Text style={styles.detailText}>
+                    <Text style={styles.label}>Mobile:</Text>
+                  </Text>
+                  <Text
+                    style={{color: 'blue', textDecorationLine: 'underline'}}>
+                    {guardian.Mobile}
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
-        </View>
-      </View>
+        
+      
     </BottomSheetView>
   );
 
@@ -133,6 +154,7 @@ const StudentDetailsBottomSheet = ({
       snapPoints={snapPoints}
       index={0}
       enablePanDownToClose={false}
+      handleComponent={null} 
       onClose={closeSheet}>
       {renderContent()}
     </BottomSheet>
@@ -145,9 +167,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     height: '100%',
+    borderRadius:30,
+    borderWidth:0.1
+    
   },
   section: {
     marginBottom: 20,
+    margin:5
   },
   sectionTitle: {
     fontSize: 16,
@@ -181,14 +207,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#333333',
   },
   detailText: {
-    fontSize: 14,
-    color: '#555',
+    fontSize: 13,
+    color: '#777777',
     marginTop: 4,
+    fontFamily: 'Avenir Next',
+    fontWeight: '300'
   },
   label: {
     color: '#000',

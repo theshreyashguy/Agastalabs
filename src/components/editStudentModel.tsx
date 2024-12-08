@@ -1,5 +1,6 @@
 import {WINDOW_HEIGHT} from '@gorhom/bottom-sheet';
 import React, {useState} from 'react';
+import {UserIcon, XCircleIcon} from 'react-native-heroicons/outline';
 import {
   View,
   Text,
@@ -12,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import {TrashIcon} from 'react-native-heroicons/solid';
 
 export type Guardian = {
   Name: string;
@@ -24,7 +26,7 @@ export type Student = {
   name: string;
   profilepicture: string;
   registrationnumber: string;
-  parentdetails: Guardian;
+  parentdetails: Guardian[];
   class: string[];
   age: number;
   mobile: number;
@@ -38,22 +40,43 @@ interface EditSchoolDetailsModalProps {
   isVisible: boolean;
   onClose: () => void;
   selectedStudent: Student;
-  onSave: (updatedStudent: Student) => void; 
+  onSave: (updatedStudent: Student) => void;
 }
-
 
 const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
   isVisible,
   onClose,
   selectedStudent,
-  onSave
+  onSave,
 }) => {
   const [formData, setFormData] = useState<Student>({
     ...selectedStudent,
   });
+  const [firstName, setFirstName] = useState(formData.name.split(' ')[0]);
+  const [LastName, setLastName] = useState(formData.name.split(' ')[1]);
 
   const handleChange = (key: keyof Student, value: any) => {
     setFormData({...formData, [key]: value});
+  };
+
+  const [newGuardian, setNewGuardian] = useState<Guardian | null>(null);
+
+  const handleNewGuardianChange = (key: keyof Guardian, value: any) => {
+    if (newGuardian) {
+      setNewGuardian({...newGuardian, [key]: value});
+    } else {
+      setNewGuardian({Name: '', profilePicture: '', Mobile: 0, Email: ''});
+    }
+  };
+
+  const saveNewGuardian = () => {
+    if (newGuardian) {
+      setFormData({
+        ...formData,
+        parentdetails: [...formData.parentdetails, newGuardian],
+      });
+      setNewGuardian(null); // Reset new guardian form
+    }
   };
 
   return (
@@ -70,7 +93,7 @@ const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Edit School Details</Text>
             <TouchableOpacity onPress={onClose}>
-              <Text style={styles.closeIcon}>✖</Text>
+              <XCircleIcon color={'red'} />
             </TouchableOpacity>
           </View>
 
@@ -94,15 +117,53 @@ const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
             {/* Form Inputs */}
             <View style={styles.formContainer}>
               {/* Personal Information */}
-              <Text style={{color: 'black', fontWeight: 'bold'}}>Name:</Text>
+              <Text
+                style={{
+                  color: 'black',
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '600',
+                  marginBottom: 8
+                }}>
+                First Name:
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder="Full Name"
+                placeholder="First Name"
                 placeholderTextColor="#888"
-                value={formData.name}
-                onChangeText={text => handleChange('name', text)}
+                value={firstName}
+                onChangeText={text => {
+                  setFirstName(text);
+                  handleChange('name', `${text}} ${LastName}`);
+                }}
               />
-              <Text style={{color: 'black', fontWeight: 'bold'}}>Mobile:</Text>
+              <Text
+                style={{
+                  color: 'black',
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '600',
+                  marginBottom: 8
+                }}>
+                Last Name:
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Last Name"
+                placeholderTextColor="#888"
+                value={LastName}
+                onChangeText={text => {
+                  setLastName(text);
+                  handleChange('name', `${firstName} ${text}`);
+                }}
+              />
+              <Text
+                style={{
+                  color: 'black',
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '600',
+                  marginBottom: 8
+                }}>
+                Phone Number:
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="Phone Number"
@@ -111,7 +172,15 @@ const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
                 value={formData.mobile.toString()}
                 onChangeText={text => handleChange('mobile', parseInt(text))}
               />
-              <Text style={{color: 'black', fontWeight: 'bold'}}>Email:</Text>
+              <Text
+                style={{
+                  color: 'black',
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '600',
+                  marginBottom: 8
+                }}>
+                Email:
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -120,7 +189,15 @@ const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
                 value={formData.email}
                 onChangeText={text => handleChange('email', text)}
               />
-              <Text style={{color: 'black', fontWeight: 'bold'}}>DOB:</Text>
+              <Text
+                style={{
+                  color: 'black',
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '600',
+                  marginBottom: 8
+                }}>
+                Date of Birth:
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="Date of Birth (e.g., 1998-12-8)"
@@ -128,7 +205,15 @@ const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
                 value={formData.DOB}
                 onChangeText={text => handleChange('DOB', text)}
               />
-              <Text style={{color: 'black', fontWeight: 'bold'}}>Class:</Text>
+              <Text
+                style={{
+                  color: 'black',
+                  fontFamily: 'Avenir Next',
+                  fontWeight: '600',
+                  marginBottom: 8
+                }}>
+                Class:
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="Class (e.g., 10A, 10B)"
@@ -149,76 +234,162 @@ const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
               <View style={styles.guardianContainer}>
                 <Text style={styles.sectionTitle}>Family Members</Text>
 
-                {/* Row for First Name and Last Name */}
-                <View style={styles.row}>
-                  <TextInput
-                    style={[styles.input, styles.halfInput]}
-                    placeholder="ex: Dhiraj"
-                    placeholderTextColor="#888"
-                    value={formData.parentdetails.Name.split(' ')[0]} // Assume first name
-                    onChangeText={text => {
-                      const lastName =
-                        formData.parentdetails.Name.split(' ')[1] || '';
-                      setFormData({
-                        ...formData,
-                        parentdetails: {
-                          ...formData.parentdetails,
-                          Name: `${text} ${lastName}`,
-                        },
-                      });
-                    }}
-                  />
-                  <TextInput
-                    style={[styles.input, styles.halfInput]}
-                    placeholder="ex: Shaw"
-                    placeholderTextColor="#888"
-                    value={formData.parentdetails.Name.split(' ')[1]} // Assume last name
-                    onChangeText={text => {
-                      const firstName =
-                        formData.parentdetails.Name.split(' ')[0];
-                      setFormData({
-                        ...formData,
-                        parentdetails: {
-                          ...formData.parentdetails,
-                          Name: `${firstName} ${text}`,
-                        },
-                      });
-                    }}
-                  />
-                </View>
+                {/* Existing Guardians */}
+                {formData.parentdetails.map((guardian, index) => (
+                  <View key={index} style={styles.guardianSection}>
+                    <Image
+                      style={{width: 45, height: 45, borderRadius: 35}}
+                      source={{uri: `${guardian.profilePicture}`}}
+                    />
+                    <View style={styles.row}>
+                      <View style={{flexDirection: 'column', width: '70%'}}>
+                        <Text style={styles.guardianTitle}>
+                          {guardian.Name}
+                        </Text>
+                        <Text style={styles.guardianEmail}>
+                          {guardian.Email}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          const updatedGuardians =
+                            formData.parentdetails.filter(
+                              (_, i) => i !== index,
+                            );
+                          setFormData({
+                            ...formData,
+                            parentdetails: updatedGuardians,
+                          });
+                        }}>
+                        <TrashIcon color={'#333333'} />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.divider} />
+                  </View>
+                ))}
 
-                {/* Phone Number */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="ex: 1234567890"
-                  placeholderTextColor="#888"
-                  keyboardType="phone-pad"
-                  value={formData.parentdetails.Mobile.toString()}
-                  onChangeText={text =>
-                    setFormData({
-                      ...formData,
-                      parentdetails: {
-                        ...formData.parentdetails,
-                        Mobile: parseInt(text),
-                      },
-                    })
-                  }
-                />
+                {/* newGuardian */}
+                {newGuardian && (
+                  <View style={styles.addGuardianForm}>
+                    <View style={styles.row}>
+                      <View style={{width: '47%'}}>
+                        <Text
+                          style={{
+                            color: 'black',
+                            fontFamily: 'Avenir Next',
+                            fontWeight: '400',
+                            marginBottom: 5,
+                          }}>
+                          First Name
+                        </Text>
+                        <TextInput
+                          style={{...styles.input}}
+                          placeholder="Ex. Dhirag"
+                          placeholderTextColor="#888"
+                          value={newGuardian.Name.split(' ')[0] || ''}
+                          onChangeText={text =>
+                            handleNewGuardianChange(
+                              'Name',
+                              `${text} ${newGuardian.Name.split(' ')[1] || ''}`,
+                            )
+                          }
+                        />
+                      </View>
+                      <View style={{width: '47%'}}>
+                        <Text
+                          style={{
+                            color: 'black',
+                            fontFamily: 'Avenir Next',
+                            fontWeight: '400',
+                            marginBottom: 5,
+                          }}>
+                          Last Name
+                        </Text>
+                        <TextInput
+                          style={{...styles.input}}
+                          placeholder="Ex Shaw"
+                          placeholderTextColor="#888"
+                          value={newGuardian.Name.split(' ')[1] || ''}
+                          onChangeText={text =>
+                            handleNewGuardianChange(
+                              'Name',
+                              `${newGuardian.Name.split(' ')[0] || ''} ${text}`,
+                            )
+                          }
+                        />
+                      </View>
+                    </View>
+                    <View>
+                      <Text
+                        style={{
+                          color: 'black',
+                          fontFamily: 'Avenir Next',
+                          fontWeight: '400',
+                          marginBottom: 8,
+                        }}>
+                        Phone Number
+                      </Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Ex: 1234567890"
+                        placeholderTextColor="#888"
+                        keyboardType="phone-pad"
+                        value={
+                          newGuardian.Mobile
+                            ? newGuardian.Mobile.toString()
+                            : ''
+                        }
+                        onChangeText={text =>
+                          handleNewGuardianChange('Mobile', parseInt(text) || 0)
+                        }
+                      />
+                    </View>
+                    <View>
+                      <Text
+                        style={{
+                          color: 'black',
+                          fontFamily: 'Avenir Next',
+                          fontWeight: '400',
+                          marginBottom: 8,
+                        }}>
+                        Email Adress
+                      </Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Ex. xyz@gmail.com"
+                        placeholderTextColor="#888"
+                        keyboardType="email-address"
+                        value={newGuardian.Email}
+                        onChangeText={text =>
+                          handleNewGuardianChange('Email', text)
+                        }
+                      />
+                    </View>
+                    <TouchableOpacity
+                      style={styles.saveDetailsButton}
+                      onPress={saveNewGuardian}>
+                      <Text style={styles.saveDetailsText}>Save Details</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
 
-                {/* Email Address */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="ex: example@email.com"
-                  placeholderTextColor="#888"
-                  keyboardType="email-address"
-                  value={formData.parentdetails.Email}
-                  onChangeText={text =>
-                    setFormData({
-                      ...formData,
-                      parentdetails: {...formData.parentdetails, Email: text},
-                    })
-                  }
-                />
+                {/* Add More Button */}
+                {!newGuardian && (
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() =>
+                      setNewGuardian({
+                        Name: '',
+                        Mobile: 0,
+                        Email: '',
+                        profilePicture:
+                          'https://randomuser.me/api/portraits/men/9.jpg',
+                      })
+                    }>
+                    <UserIcon color={'#333333'} />
+                    <Text style={styles.addText}>Add More</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </ScrollView>
@@ -228,12 +399,13 @@ const EditSchoolDetailsModal: React.FC<EditSchoolDetailsModalProps> = ({
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.saveButton} onPress={()=>{
-
-            //  console.log(formData);
-               onSave(formData); // Pass updated student data to parent
-               onClose(); // Close modal after saving
-            }}>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={() => {
+                //  console.log(formData);
+                onSave(formData); // Pass updated student data to parent
+                onClose(); // Close modal after saving
+              }}>
               <Text style={styles.saveText}>Save Changes</Text>
             </TouchableOpacity>
           </View>
@@ -255,7 +427,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    height: WINDOW_HEIGHT * 0.8, // Responsive height
+    height: WINDOW_HEIGHT * 0.9, // Responsive height
     alignItems: 'flex-start',
   },
   header: {
@@ -270,7 +442,10 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     fontSize: 18,
-    color: 'black',
+    color: 'red',
+    borderColor: 'red',
+    borderWidth: 1,
+    borderRadius: 20,
   },
   scrollContent: {
     alignItems: 'center',
@@ -278,6 +453,9 @@ const styles = StyleSheet.create({
   },
   profileImageContainer: {
     marginVertical: 20,
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'flex-start',
   },
   profileImage: {
     width: 100,
@@ -287,6 +465,11 @@ const styles = StyleSheet.create({
   formContainer: {
     width: '100%',
   },
+  addGuardianForm: {
+    marginTop: 15,
+    borderRadius: 8,
+    backgroundColor: 'white',
+  },
   input: {
     height: 40,
     borderWidth: 1,
@@ -294,7 +477,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    color: 'black', // Ensure text color is black
+    color: '#777777', // Ensure text color is black
+    fontWeight: '300',
   },
   divider: {
     height: 1,
@@ -309,14 +493,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saveDetailsButton: {
-    backgroundColor: 'black',
+    backgroundColor: 'white',
     paddingVertical: 10,
     alignItems: 'center',
-    borderRadius: 5,
+    borderRadius: 10,
     marginVertical: 10,
+    width: '45%',
+    marginLeft: 'auto',
+    borderWidth: 0.6,
   },
   saveDetailsText: {
-    color: '#fff',
+    color: 'black',
     fontSize: 16,
   },
   footer: {
@@ -359,6 +546,52 @@ const styles = StyleSheet.create({
   },
   halfInput: {
     width: '48%',
+  },
+  guardianSection: {
+    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  guardianTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#777777',
+    marginBottom: 5,
+    marginLeft: 5,
+  },
+  guardianEmail: {
+    fontSize: 14,
+    fontWeight: '300',
+    color: '#777777',
+    marginBottom: 5,
+    marginLeft: 5,
+    width: 170,
+  },
+  addButton: {
+    backgroundColor: 'white',
+    padding: 8,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '42%',
+    borderWidth: 0.5,
+  },
+  addText: {
+    color: '#333333',
+    fontWeight: '400',
+  },
+  removeButton: {
+    backgroundColor: '#F44336',
+    padding: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  removeText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
